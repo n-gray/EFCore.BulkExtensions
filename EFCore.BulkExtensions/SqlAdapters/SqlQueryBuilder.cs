@@ -20,20 +20,20 @@ public abstract class SqlQueryBuilder
     public abstract string RestructureForBatch(string sql, bool isDelete = false);
 
     /// <summary>
-    /// Returns a DbParameters intanced per provider
+    /// Returns a DbParameters instanced per provider
     /// </summary>
     /// <param name="sqlParameter"></param>
     /// <returns></returns>
     public abstract object CreateParameter(SqlParameter sqlParameter);
 
     /// <summary>
-    /// Returns NpgsqlDbType for PostgreSql parameters. Throws <see cref="NotImplementedException"/> for anothers providers
+    /// Returns NpgsqlDbType for PostgreSql parameters. Throws <see cref="NotImplementedException"/> for other providers
     /// </summary>
     /// <returns></returns>
     public abstract object Dbtype();
 
     /// <summary>
-    /// Returns void. Throws <see cref="NotImplementedException"/> for anothers providers
+    /// Returns void. Throws <see cref="NotImplementedException"/> for other providers
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
     public abstract void SetDbTypeParam(object npgsqlParameter, object dbType);
@@ -62,7 +62,7 @@ public abstract class SqlQueryBuilder
     /// <returns></returns>
     public virtual string CreateTableCopy(string existingTableName, string newTableName, TableInfo tableInfo, bool isOutputTable = false)
     {
-        // TODO: (optionaly) if CalculateStats = True but SetOutputIdentity = False then Columns could be ommited from Create and from MergeOutput
+        // TODO: (optionally) if CalculateStats = True but SetOutputIdentity = False then Columns could be ommited from Create and from MergeOutput
         List<string> columnsNames = (isOutputTable ? tableInfo.OutputPropertyColumnNamesDict
                                                    : tableInfo.PropertyColumnNamesDict
                                                    ).Values.ToList();
@@ -77,7 +77,7 @@ public abstract class SqlQueryBuilder
 
         var q = $"SELECT TOP 0 {GetCommaSeparatedColumns(columnsNames, "T")}" + timeStampColumn + statsColumn + " " +
                 $"INTO {newTableName} FROM {existingTableName} AS T " +
-                $"LEFT JOIN {existingTableName} AS Source ON 1 = 0;"; // removes Identity constrain
+                $"LEFT JOIN {existingTableName} AS Source ON 1 = 0;"; // removes Identity constraint
         return q;
     }
 
@@ -492,7 +492,7 @@ public abstract class SqlQueryBuilder
         return q;
     }
 
-    // propertColumnsNamesDict used with Sqlite for @parameter to be save from non valid charaters ('', '!', ...) that are allowed as column Names in Sqlite
+    // propertyColumnsNamesDict used with Sqlite for @parameter to be save from non valid charaters ('', '!', ...) that are allowed as column Names in Sqlite
 
     /// <summary>
     /// Generates SQL query to get comma seperated column
@@ -500,10 +500,10 @@ public abstract class SqlQueryBuilder
     /// <param name="columnsNames"></param>
     /// <param name="prefixTable"></param>
     /// <param name="equalsTable"></param>
-    /// <param name="propertColumnsNamesDict"></param>
+    /// <param name="propertyColumnsNamesDict"></param>
     /// <returns></returns>
     public static string GetCommaSeparatedColumns(List<string> columnsNames, string? prefixTable = null, string? equalsTable = null,
-                                                  Dictionary<string, string>? propertColumnsNamesDict = null)
+                                                  Dictionary<string, string>? propertyColumnsNamesDict = null)
     {
         prefixTable += (prefixTable != null && prefixTable != "@") ? "." : "";
         equalsTable += (equalsTable != null && equalsTable != "@") ? "." : "";
@@ -511,7 +511,7 @@ public abstract class SqlQueryBuilder
         string commaSeparatedColumns = "";
         foreach (var columnName in columnsNames)
         {
-            var equalsParameter = propertColumnsNamesDict == null ? columnName : propertColumnsNamesDict.SingleOrDefault(a => a.Value == columnName).Key;
+            var equalsParameter = propertyColumnsNamesDict == null ? columnName : propertyColumnsNamesDict.SingleOrDefault(a => a.Value == columnName).Key;
             commaSeparatedColumns += prefixTable != "" ? $"{prefixTable}[{columnName}]" : $"[{columnName}]";
             commaSeparatedColumns += equalsTable != "" ? $" = {equalsTable}[{equalsParameter}]" : "";
             commaSeparatedColumns += ", ";
@@ -550,12 +550,12 @@ public abstract class SqlQueryBuilder
     /// <param name="prefixTable"></param>
     /// <param name="equalsTable"></param>
     /// <param name="updateByPropertiesAreNullable"></param>
-    /// <param name="propertColumnsNamesDict"></param>
+    /// <param name="propertyColumnsNamesDict"></param>
     /// <returns></returns>
     public static string GetANDSeparatedColumns(List<string> columnsNames, string? prefixTable = null, string? equalsTable = null, bool updateByPropertiesAreNullable = false,
-                                                Dictionary<string, string>? propertColumnsNamesDict = null)
+                                                Dictionary<string, string>? propertyColumnsNamesDict = null)
     {
-        string commaSeparatedColumns = GetCommaSeparatedColumns(columnsNames, prefixTable, equalsTable, propertColumnsNamesDict);
+        string commaSeparatedColumns = GetCommaSeparatedColumns(columnsNames, prefixTable, equalsTable, propertyColumnsNamesDict);
 
         if (updateByPropertiesAreNullable)
         {
